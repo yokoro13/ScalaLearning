@@ -10,16 +10,34 @@ case object Nil extends List[Nothing] // 空のリストを表すデータコン
 case class Cons[+A](head: A, tail: List[A]) extends List[A] // 空ではないリストを表すデータコンストラクタ
 
 object List {
-  def sum(ints: List[Int]): Int = ints match {
-    case Nil => 0
-    case Cons(x, xs) => x + sum(xs)
-  }
+  def sum(ints: List[Int]): Int =
+    foldRight(ints, 0)((x,y) => x + y)
 
-  def product(ds: List[Double]): Double = ds match {
-    case Nil => 1.0
-    case Cons(0.0, _) => 0.0
-    case Cons(x, xs) => x * product(xs)
-  }
+  def sum2(ints: List[Int]): Int =
+    foldLeft(ints, 0)((x, y) => x + y)
+
+  def product(ds: List[Double]): Double =
+    foldRight(ds, 1.0)((x, y) => x * y)
+
+  def foldRight[A,B](as: List[A], z: B)(f: (A, B) => B): B =
+    as match {
+      case Nil => z
+      case Cons(x, xs) => f(x, foldRight(xs, z)(f))
+    }
+
+  def reverse[A](l: List[A]): List[A] =
+    l match {
+      case Nil => l
+    }
+
+  def foldLeft[A,B](as: List[A], z: B)(f: (B, A) => B): B =
+    as match {
+      case Nil => z
+      case Cons(x, xs) => foldLeft(xs, f(z, x))(f)
+    }
+
+  def length[A](as: List[A]): Int =
+    foldRight(as, 0)((_, y) => y + 1)
 
   def tail[A](l: List[A]): List[A] = l match {
     case Nil => sys.error("tail of empty list")
@@ -39,8 +57,9 @@ object List {
     }
   }
 
-  def dropWhile[A](l: List[A], f: A => Boolean): List[A] = l match {
-    case Cons(h, t) if f(h) => dropWhile(t, f)
+  // List[A] で A の型は確定している
+  def dropWhile[A](l: List[A])(f: A => Boolean): List[A] = l match {
+    case Cons(h, t) if f(h) => dropWhile(t)(f)
     case _ => l
   }
 
@@ -76,5 +95,8 @@ object Main {
     println(List.tail(List(1, 2, 3, 4)))
     println(List.setHead(5, List(1, 2, 3, 4)))
     println(List.drop(List(1, 2, 3, 4), 3))
+
+    val xs: List[Int] = List(1, 2, 3, 4)
+    val ex4 = List.dropWhile(xs)(x => x < 4)
   }
 }

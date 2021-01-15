@@ -1,4 +1,4 @@
-package chapater2
+package chapter2
 
 object GettingStarted {
 
