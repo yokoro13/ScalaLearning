@@ -119,6 +119,21 @@ object List {
       case (Cons(h1, t1), Cons(h2, t2)) => Cons(f(h1, h2), zipWith(t1, t2)(f))
     }
 
+  @scala.annotation.tailrec
+  def startWith[A](l: List[A], prefix: List[A]): Boolean =
+    (l, prefix) match {
+      case (_, Nil) => true
+      case (Cons(h1, t1), Cons(h2, t2)) if h1 == h2 => startWith(t1, t2)
+      case _ => false
+    }
+
+  @scala.annotation.tailrec
+  def hasSubsequence[A](sup: List[A], sub: List[A]): Boolean =
+    sup match {
+      case Nil => sub == Nil
+      case _ if startWith(sup, sub) => true
+      case Cons(_, t) => hasSubsequence(t, sub)
+    }
 }
 
 object Main {
@@ -145,5 +160,8 @@ object Main {
     val ex4 = List.dropWhile(xs)(x => x < 4)
 
     val ex5 = List.filter(xs)(x => x < 3)
+
+    val ex6 = List.hasSubsequence(xs, List(1, 5))
+    println(ex6)
   }
 }
