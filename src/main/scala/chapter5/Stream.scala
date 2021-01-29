@@ -31,7 +31,7 @@ trait Stream[+A] {
 
   def drop(n: Int): Stream[A] =
     this match {
-      case Cons(_, t) if n > 0 => t().drop(n-1)
+      case Cons(_, t) if n > 0 => t().drop(n - 1)
       case _ => Empty
     }
 
@@ -56,7 +56,7 @@ trait Stream[+A] {
   def forAll(p: A => Boolean): Boolean =
     foldRight(true)((a, b) => p(a) && b)
 
-  def map[B](f: A=>B): Stream[B] =
+  def map[B](f: A => B): Stream[B] =
     foldRight(Empty[B])((h, t) => Cons(f(h), t))
 
   def filter(f: A => Boolean): Stream[A] =
@@ -69,15 +69,15 @@ trait Stream[+A] {
     foldRight(Empty[B])((h, t) => f(h) append t)
 
   def mapViaUnfold[B](f: A => B): Stream[B] =
-    unfold(this){
+    unfold(this) {
       case Cons(h, t) => Some((f(h()), t()))
       case _ => None
     }
 
   def takeViaUnfold(n: Int): Stream[A] =
-    unfold((this, n)){
+    unfold((this, n)) {
       case (Cons(h, t), 1) => Some((h(), (t(), 0)))
-      case (Cons(h, t), n) if n > 1 => Some((h(), (t(), n-1)))
+      case (Cons(h, t), n) if n > 1 => Some((h(), (t(), n - 1)))
       case _ => None
     }
 
@@ -120,10 +120,12 @@ trait Stream[+A] {
       lazy val p1 = p0
       val b2 = f(a, p1._1)
       (b2, Cons(b2, p1._2))
-  })._2
+    })._2
 
 }
+
 case object Empty extends Stream[Nothing]
+
 case class Cons[+A](h: () => A, t: () => Stream[A]) extends Stream[A] // () => A : サンク(thunk)
 
 object Stream {
@@ -145,12 +147,13 @@ object Stream {
   }
 
   def from(n: Int): Stream[Int] =
-    cons(n, from(n+1))
+    cons(n, from(n + 1))
 
   def fibs: Stream[Int] = {
     def loop(n1: Int, n2: Int): Stream[Int] = {
-      cons(n1, loop(n2, n1+n2))
+      cons(n1, loop(n2, n1 + n2))
     }
+
     loop(0, 1)
   }
 
@@ -161,10 +164,10 @@ object Stream {
     }
 
   def fibViaUnfold: Stream[Int] =
-    unfold((0, 1)){ case (f0, f1) => Some((f0, (f1, f0+f1)))}
+    unfold((0, 1)) { case (f0, f1) => Some((f0, (f1, f0 + f1))) }
 
   def fromViaUnfold(n: Int): Stream[Int] =
-    unfold(n)(n => Some((n, n+1)))
+    unfold(n)(n => Some((n, n + 1)))
 
   def constantViaUnfold[A](a: A): Stream[A] =
     unfold(a)(_ => Some((a, a)))
